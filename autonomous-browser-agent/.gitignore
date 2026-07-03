@@ -1,0 +1,15 @@
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+.venv/
+venv/
+.env
+*.db
+playwright-report/
+test-results/
+alembic/versions/*.pyc
+.ruff_cache/
+.mypy_cache/
+.pytest_cache/
