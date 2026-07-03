@@ -1,0 +1,32 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: analyst
+      POSTGRES_PASSWORD: analyst
+      POSTGRES_DB: analyst_db
+    ports:
+      - "5436:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U analyst -d analyst_db"]
+      interval: 5s
+      retries: 5
+
+  backend:
+    build: ./backend
+    ports:
+      - "8004:8004"
+    environment:
+      DATABASE_URL: postgresql+asyncpg://analyst:analyst@db:5432/analyst_db
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - ./backend:/app
+    command: ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8004", "--reload"]
+
+volumes:
+  pgdata:
