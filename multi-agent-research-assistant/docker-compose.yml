@@ -1,0 +1,27 @@
+services:
+  app:
+    build: .
+    ports:
+      - "8001:8001"
+    env_file: .env
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: agent
+      POSTGRES_PASSWORD: agent
+      POSTGRES_DB: research_db
+    ports:
+      - "5433:5432"
+    volumes:
+      - research_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U agent -d research_db"]
+      interval: 3s
+      retries: 5
+
+volumes:
+  research_pgdata:
